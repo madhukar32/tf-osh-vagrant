@@ -1,4 +1,4 @@
-#!/bin/bash -v 
+#!/bin/bash -v
 
 ### Define Directory Vairable for the OSH and Contrail Repos for Chrats Installation ############
 export BASE_DIR=/opt
@@ -12,29 +12,29 @@ export CONTAINER_TAG=latest
 
 
 ### Define Nodes names for K8s Labeling "opencontrail.org/controller", "opencontrail.org/vrouter-kernel" & "opencontrail.org/vrouter-dpdk"  #######
-export CONTRAIL_CONTROLLER_NODE_01=k8s-node01
-export CONTRAIL_CONTROLLER_NODE_02=k8s-node02
-export CONTRAIL_CONTROLLER_NODE_03=k8s-node03
+export CONTRAIL_CONTROLLER_NODE_01=k8s-node1
+export CONTRAIL_CONTROLLER_NODE_02=k8s-node2
+export CONTRAIL_CONTROLLER_NODE_03=k8s-node3
 
-export CONTRAIL_COMPUTE_KERNEL_01=k8s-node01
-export CONTRAIL_COMPUTE_KERNEL_02=k8s-node02
-export CONTRAIL_COMPUTE_KERNEL_02=k8s-node03
+export CONTRAIL_COMPUTE_KERNEL_01=k8s-node1
+export CONTRAIL_COMPUTE_KERNEL_02=k8s-node2
+export CONTRAIL_COMPUTE_KERNEL_02=k8s-node3
 
 #export CONTRAIL_COMPUTE_DPDK_01=k8s-node03
 #export CONTRAIL_COMPUTE_DPDK_02=k8s-node04
 
 ##### Controller IP Addresses MGMT Network ###########
-export CONTROLLER_NODE_01=10.13.82.237
-export CONTROLLER_NODE_02=10.13.82.238
-export CONTROLLER_NODE_03=10.13.82.239
+export CONTROLLER_NODE_01=192.168.50.1
+export CONTROLLER_NODE_02=192.168.50.2
+export CONTROLLER_NODE_03=192.168.50.3
 
 ######### Contrail Control and Data Plane ##################
-export CONTROL_NODE_01=192.168.1.237
-export CONTROL_NODE_02=192.168.1.238
-export CONTROL_NODE_03=192.168.1.239
+export CONTROL_NODE_01=192.168.50.1
+export CONTROL_NODE_02=192.168.50.2
+export CONTROL_NODE_03=192.168.50.3
 
-export CONTROL_DATA_NET_LIST=192.168.1.0/24
-export VROUTER_GATEWAY=192.168.1.1
+export CONTROL_DATA_NET_LIST=192.168.50.0/24
+export VROUTER_GATEWAY=192.168.50.1
 
 ##### Only used for Calico as CNI to change Contrail Controller port to 1179 ########
 export BGP_PORT=1179
@@ -43,12 +43,12 @@ export BGP_PORT=1179
 export AGENT_MODE_KERNEL=nic
 
 ### vRouter DPDK Config Values #######
-export DPDK_PHYSICAL_INTERFACE=enp0s9
-export CPU_CORE_MASK="0xff"
-export DPDK_UIO_DRIVER=uio_pci_generic
-export HUGE_PAGES=49000
-export AGENT_MODE_DPDK=dpdk
-export HUGE_PAGES_DIR=/hugepages
+#export DPDK_PHYSICAL_INTERFACE=enp0s9
+#export CPU_CORE_MASK="0xff"
+#export DPDK_UIO_DRIVER=uio_pci_generic
+#export HUGE_PAGES=49000
+#export AGENT_MODE_DPDK=dpdk
+#export HUGE_PAGES_DIR=/hugepages
 
 ################## Installastion of Contrail Helm Charts ##############################
 cd ${CHD_PATH}
@@ -123,8 +123,8 @@ global:
     CONTROL_NODES: $(cat /var/tmp/contrail-control)
     BGP_PORT: 1179
     LOG_LEVEL: SYS_NOTICE
-    CLOUD_ORCHESTRATOR: openstack 
-    AAA_MODE: cloud-admin 
+    CLOUD_ORCHESTRATOR: openstack
+    AAA_MODE: cloud-admin
     BGP_PORT: $BGP_PORT
     VROUTER_GATEWAY: ${VROUTER_GATEWAY}
 
@@ -132,19 +132,6 @@ global:
   contrail_env_vrouter_kernel:
     AGENT_MODE: ${AGENT_MODE_KERNEL}
     CONTROL_DATA_NET_LIST: ${CONTROL_DATA_NET_LIST}
-
-# section of vrouter template for dpdk mode
-  contrail_env_vrouter_dpdk:
-    CONTROL_DATA_NET_LIST: ${CONTROL_DATA_NET_LIST}
-    DPDK_MEM_PER_SOCKET: 1024
-    PHYSICAL_INTERFACE: ${DPDK_PHYSICAL_INTERFACE}
-    #PHYSICAL_INTERFACE: bond0
-    #PHYSICAL_INTERFACE: p3p1
-    CPU_CORE_MASK: "$CPU_CORE_MASK"
-    DPDK_UIO_DRIVER: ${DPDK_UIO_DRIVER}
-    HUGE_PAGES: ${HUGE_PAGES}
-    AGENT_MODE: ${AGENT_MODE_DPDK}
-    HUGE_PAGES_DIR: /hugepages
 
   node:
     host_os: ubuntu
@@ -154,8 +141,8 @@ global:
 # Example of overriding values of subchart, where contrail-vrouter is name of the subchart
 contrail-vrouter:
   manifests:
-    configmap_vrouter_dpdk: true
-    daemonset_dpdk: true
+    configmap_vrouter_dpdk: false
+    daemonset_dpdk: false
 EOF
 
 ############## Use this section if you would like to install each Contrail Chart separately using "values.yaml" file #######

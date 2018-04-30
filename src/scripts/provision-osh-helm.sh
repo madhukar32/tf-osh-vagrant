@@ -1,16 +1,16 @@
-#!/bin/bash -v 
+#!/bin/bash -v
 
-export OSH_CONTRAIL_NODE_01=10.13.82.237
-export OSH_CONTRAIL_NODE_02=10.13.82.238
-export OSH_CONTRAIL_NODE_03=10.13.82.239
+export OSH_CONTRAIL_NODE_01=192.168.50.1
+export OSH_CONTRAIL_NODE_02=192.168.50.2
+export OSH_CONTRAIL_NODE_03=192.168.50.3
 
-export OSH_CONTROLLER_01=k8s-node01
-export OSH_CONTROLLER_02=k8s-node02
-export OSH_CONTROLLER_03=k8s-node03
+export OSH_CONTROLLER_01=k8s-node1
+export OSH_CONTROLLER_02=k8s-node2
+export OSH_CONTROLLER_03=k8s-node3
 
-export OSH_COMPUTE_01=k8s-node01
-export OSH_COMPUTE_02=k8s-node02
-export OSH_COMPUTE_03=k8s-node03
+export OSH_COMPUTE_01=k8s-node1
+export OSH_COMPUTE_02=k8s-node2
+export OSH_COMPUTE_03=k8s-node3
 
 ssh-keygen -t rsa -f /root/.ssh/id_rsa -q -P ""
 
@@ -23,11 +23,11 @@ sshpass -p "Juniper123" ssh-copy-id -i ~/.ssh/id_rsa.pub -o StrictHostKeyCheckin
 sshpass -p "Juniper123" ssh-copy-id -i ~/.ssh/id_rsa.pub -o StrictHostKeyChecking=no root@${OSH_CONTRAIL_NODE_03}
 
 # Download openstack-helm code
-sudo git clone https://github.com/Juniper/openstack-helm.git /opt/openstack-helm
+sudo git clone https://github.com/Juniper/openstack-helm.git /opt/openstack-helm -b R5.0
 # Download openstack-helm-infra code
-sudo git clone https://github.com/Juniper/openstack-helm-infra.git /opt/openstack-helm-infra
+sudo git clone https://github.com/Juniper/openstack-helm-infra.git /opt/openstack-helm-infra -b R5.0
 # Download contrail-helm-deployer code
-sudo git clone https://github.com/Juniper/contrail-helm-deployer.git /opt/contrail-helm-deployer
+sudo git clone https://github.com/Juniper/contrail-helm-deployer.git /opt/contrail-helm-deployer -b R5.0
 
 sudo ssh ${OSH_CONTRAIL_NODE_02} "git clone https://github.com/Juniper/openstack-helm.git /opt/openstack-helm"
 sudo ssh ${OSH_CONTRAIL_NODE_03} "git clone https://github.com/Juniper/openstack-helm.git /opt/openstack-helm"
@@ -87,6 +87,10 @@ EOF
 
 ######## Create Env Variables for K8s Clsuter
 cat > /opt/openstack-helm-infra/tools/gate/devel/multinode-vars.yaml <<EOF
+#version:
+# kubernetes: v1.9.3
+# helm: v2.7.2
+# cni: v0.6.0
 kubernetes:
   network:
   cluster:
@@ -97,11 +101,19 @@ kubernetes:
 docker:
  insecure_registries:
    - 10.84.5.81:5000
+ # list of private secure docker registry auth info, from where you will be pulling container images
+ #private_registries:
+ #  - name: <docker-registry-name>
+ #    username: username@abc.xyz
+ #    email: username@abc.xyz
+ #    password: password
+ #    secret_name: contrail-image-secret
+ #    namespace: openstack
 EOF
 
 cd ${OSH_INFRA_PATH}
-make dev-deploy setup-host multinode 
-make dev-deploy k8s multinode 
+make dev-deploy setup-host multinode
+make dev-deploy k8s multinode
 # sudo -H su -c 'cd /opt/openstack-helm-infra; make all'
 
 ################ OpenStack Control and Compute Labeling ##############
@@ -156,6 +168,3 @@ cd ${OSH_PATH}
 ./tools/deployment/multinode/141-compute-kit-opencontrail.sh
 
 ############# OpenStack Helm Charts Provisioning Completed #####################
-
-
-
