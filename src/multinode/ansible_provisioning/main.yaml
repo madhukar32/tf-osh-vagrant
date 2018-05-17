@@ -1,0 +1,15 @@
+#- hosts: master
+#  gather_facts: False
+#  become: yes
+#  roles:
+#    - install_osh
+#  tags:
+#    - install_osh
+
+- hosts: master
+  gather_facts: False
+  become: yes
+  roles:
+    - install_contrail
+  tags:
+    - install_contrail

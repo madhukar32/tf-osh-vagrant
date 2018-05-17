@@ -1,0 +1,1 @@
+{"virtualbox":{"/vagrant":{"type":"virtualbox","guestpath":"/vagrant","hostpath":"/root/tf-osh-vagrant/src/aio","disabled":false,"__vagrantfile":true}}}

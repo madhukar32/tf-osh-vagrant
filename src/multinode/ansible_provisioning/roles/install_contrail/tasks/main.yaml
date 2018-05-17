@@ -1,0 +1,2 @@
+- name: Run Contrail provisioning bash script
+  shell: bash /vagrant/scripts/provision-tf-parent-chart-helm.sh > /var/log/contrail_provisioning.log

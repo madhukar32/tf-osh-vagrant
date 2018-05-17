@@ -5,15 +5,19 @@ Vagrant.configure("2") do |config|
 #### Please update vm.network lines as per your environment. In my setup I have bridge interface "br0" and have Inetrnet access.
   config.vm.define "aio-node", primary: true do |aio|
     aio.vm.box = "qarham/ubuntu-1604-250G"
-    aio.vm.network "public_network", bridge: "br0", ip: "10.13.82.46"
-    aio.vm.provision "shell",inline: "route add default gw 10.13.82.1"
-    aio.vm.provision "shell",inline: "eval `route -n | awk '{ if ($8 ==\"enp0s3\" && $2 != \"0.0.0.0\") print \"route del default gw \" $2; }'`"
-    aio.vm.hostname = "aio-node"
     aio.vm.synced_folder ".", "/vagrant", type: "virtualbox"
-    aio.vm.provision "shell", path: "scripts/resolve-conf.sh"
+    aio.vm.hostname = "aio-node"
+
+    aio.vm.network "private_network", ip: "10.0.20.10"
+    aio.vm.network "forwarded_port", guest: 8143, host: "6143"
+    aio.vm.network "forwarded_port", guest: 8083, host: "6183"
+    aio.vm.network "forwarded_port", guest: 8085, host: "6185"
+    aio.vm.network "forwarded_port", guest: 8082, host: "6182"
+    aio.vm.network "forwarded_port", guest: 31000, host: "31010"
+
     aio.vm.provision "shell", path: "scripts/ntp.sh"
     aio.vm.provision "shell", path: "scripts/enable_root_login.sh"
-    aio.vm.provision "shell", path: "scripts/aio-helm-deployer.sh"
+    aio.vm.provision "shell", path: "scripts/chd_helm_deployer_aio.sh"
     aio.vm.provider "virtualbox" do |vb|
       vb.memory = 32768
       vb.cpus = 6
