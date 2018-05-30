@@ -1,1 +1,1 @@
-../scripts/enable_root_login.sh
+../../scripts/enable_root_login.sh

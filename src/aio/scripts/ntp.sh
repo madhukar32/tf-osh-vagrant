@@ -1,1 +1,1 @@
-../scripts/ntp.sh
+../../scripts/ntp.sh
